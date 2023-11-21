@@ -1,11 +1,12 @@
 ﻿using BattleShipEngine;
 using BattleShipStrategies.Default;
+using BattleShipStrategies.Honza;
 using BattleShipStrategies.Slavek;
 
 
 var participants = new List<Participant>()
 {
-    new("Default", new DefaultBoardCreationStrategy(), new DefaultGameStrategy()),
+    new("Honza", new HonzaBoardCreationStrategy(), new HonzaGameStrategy()),
     new("SmartRandom", new DefaultBoardCreationStrategy(), new SmartRandomStrategy()),
     //new("Interactive", new InteractiveBoardCreationStrategy(), new InteractiveGameStrategy())
 };
