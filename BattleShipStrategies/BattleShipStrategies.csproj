@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Honza\HonzaBoardCreationStrategy.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\BattleShipEngine\BattleShipEngine.csproj" />
   </ItemGroup>
 

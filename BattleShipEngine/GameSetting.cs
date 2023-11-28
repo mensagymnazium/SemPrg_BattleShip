@@ -5,7 +5,7 @@ namespace BattleShipEngine;
 /// </summary>
 /// <param name="Height">Height of the board</param>
 /// <param name="Width">Width of the board</param>
-///<param name="BoatCount">The 0th element is the amount of <c>1 tile long boats</c>, the 1th element is the amount of <c>2 tile long boats</c>, ...</param>
+/// <param name="BoatCount">The 0th element is the amount of <c>1 tile long boats</c>, the 1th element is the amount of <c>2 tile long boats</c>, ...</param>
 public readonly record struct GameSetting(
     int Height,
     int Width,

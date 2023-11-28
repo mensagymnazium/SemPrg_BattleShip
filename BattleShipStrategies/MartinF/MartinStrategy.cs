@@ -335,7 +335,7 @@ public class MartinStrategy : IGameStrategy
         Sunk,
         Miss
     }
-    private static class Extensions
+    public static class Extensions
     {
 
         /// <returns>Points that are to the right, top right, top, ... in counterclockwise order starting from right</returns>

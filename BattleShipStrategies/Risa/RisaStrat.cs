@@ -27,26 +27,29 @@ namespace BattleShipStrategies.Risa
                 {
                     if (canBeShip[lastShip[lastShip.Count-1].Item1, lastShip[lastShip.Count - 1].Item2+1] == 0)
                     {
+                        lastShot = (lastShip[lastShip.Count - 1].Item1, lastShip[lastShip.Count - 1].Item2 + 1);
                         return new Int2
                         {
-                            X = lastShip[lastShip.Count - 1].Item1 - 1,
-                            Y = lastShip[lastShip.Count - 1].Item2
+                            X = lastShot.Item1 - 1,
+                            Y = lastShot.Item2 - 1,
                         };
                     }
                     if (canBeShip[lastShip[lastShip.Count - 1].Item1, lastShip[lastShip.Count - 1].Item2 - 1] == 0)
                     {
+                        lastShot = (lastShip[lastShip.Count - 1].Item1, lastShip[lastShip.Count - 1].Item2 - 1);
                         return new Int2
                         {
-                            X = lastShip[lastShip.Count - 1].Item1 - 1,
-                            Y = lastShip[lastShip.Count - 1].Item2 - 2
+                            X = lastShot.Item1 - 1,
+                            Y = lastShot.Item2 - 1,
                         };
                     }
                     if (canBeShip[lastShip[0].Item1, lastShip[0].Item2 - 1] == 0)
                     {
+                        lastShot = (lastShip[0].Item1, lastShip[0].Item2 - 1);
                         return new Int2
                         {
-                            X = lastShip[0].Item1 - 1,
-                            Y = lastShip[0].Item2 - 2
+                            X = lastShot.Item1 - 1,
+                            Y = lastShot.Item2 - 1,
                         };
                     }
                     throw new Exception("moveNotFound");
@@ -55,60 +58,67 @@ namespace BattleShipStrategies.Risa
                 {
                     if (canBeShip[lastShip[lastShip.Count - 1].Item1 + 1, lastShip[lastShip.Count - 1].Item2] == 0)
                     {
+                        lastShot = (lastShip[lastShip.Count - 1].Item1 + 1, lastShip[lastShip.Count - 1].Item2);
                         return new Int2
                         {
-                            X = lastShip[lastShip.Count - 1].Item1,
-                            Y = lastShip[lastShip.Count - 1].Item2 - 1
+                            X = lastShot.Item1 - 1,
+                            Y = lastShot.Item2 - 1,
                         };
                     }
                     if (canBeShip[lastShip[lastShip.Count - 1].Item1- 1, lastShip[lastShip.Count - 1].Item2] == 0)
                     {
+                        lastShot = (lastShip[lastShip.Count - 1].Item1 - 1, lastShip[lastShip.Count - 1].Item2);
                         return new Int2
                         {
-                            X = lastShip[lastShip.Count - 1].Item1 -2,
-                            Y = lastShip[lastShip.Count - 1].Item2-1
+                            X = lastShot.Item1 - 1,
+                            Y = lastShot.Item2 - 1,
                         };
                     }
                     if (canBeShip[lastShip[0].Item1 - 1, lastShip[0].Item2] == 0)
                     {
+                        lastShot = (lastShip[0].Item1-1, lastShip[0].Item2);
                         return new Int2
                         {
-                            X = lastShip[0].Item1 - 2,
-                            Y = lastShip[0].Item2 - 1
+                            X = lastShot.Item1 - 1,
+                            Y = lastShot.Item2 - 1,
                         };
                     }
                     throw new Exception("moveNotFound");
                 }
                 if (canBeShip[lastShip[0].Item1 + 1, lastShip[0].Item2] == 0)
                 {
+                    lastShot = (lastShip[0].Item1+1, lastShip[0].Item2);
                     return new Int2
                     {
-                        X = lastShip[0].Item1,
-                        Y = lastShip[0].Item2-1
+                        X = lastShot.Item1 - 1,
+                        Y = lastShot.Item2 - 1,
                     };
                 }
                 if (canBeShip[lastShip[0].Item1, lastShip[0].Item2 + 1] == 0)
                 {
+                    lastShot = (lastShip[0].Item1, lastShip[0].Item2+1);
                     return new Int2
                     {
-                        X = lastShip[0].Item1-1,
-                        Y = lastShip[0].Item2
+                        X = lastShot.Item1 - 1,
+                        Y = lastShot.Item2 - 1,
                     };
                 }
                 if (canBeShip[lastShip[0].Item1 - 1, lastShip[0].Item2] == 0)
                 {
+                    lastShot = (lastShip[0].Item1-1, lastShip[0].Item2);
                     return new Int2
                     {
-                        X = lastShip[0].Item1 - 2,
-                        Y = lastShip[0].Item2-1
+                        X = lastShot.Item1 - 1,
+                        Y = lastShot.Item2 - 1,
                     };
                 }
                 if (canBeShip[lastShip[0].Item1, lastShip[0].Item2 - 1] == 0)
                 {
+                    lastShot = (lastShip[0].Item1, lastShip[0].Item2-1);
                     return new Int2
                     {
-                        X = lastShip[0].Item1-1,
-                        Y = lastShip[0].Item2 - 2
+                        X = lastShot.Item1 - 1,
+                        Y = lastShot.Item2 - 1,
                     };
                 }
                 throw new Exception("moveNotFound");
@@ -186,9 +196,9 @@ namespace BattleShipStrategies.Risa
 
         public void RespondSunk()
         {
-            shipCount[lastShip.Count]--;
+            shipCount[lastShip.Count-1]--;
             missList.AddRange(lastShip);
-            lastShip.Clear();
+            
             dir = 'n';
             foreach ((int, int) square in lastShip)
             {
@@ -200,32 +210,45 @@ namespace BattleShipStrategies.Risa
                 canBeShip[square.Item1 + 1, square.Item2 - 1] = -1;
                 canBeShip[square.Item1 + 1, square.Item2] = -1;
                 canBeShip[square.Item1 + 1, square.Item2 + 1] = -1;
+                missList.Add((square.Item1 - 1, square.Item2 - 1));
+                missList.Add((square.Item1 - 1, square.Item2 ));
+                missList.Add((square.Item1 - 1, square.Item2 + 1));
+                missList.Add((square.Item1, square.Item2 - 1));
+                missList.Add((square.Item1, square.Item2 + 1));
+                missList.Add((square.Item1 + 1, square.Item2 - 1));
+                missList.Add((square.Item1 + 1, square.Item2));
+                missList.Add((square.Item1 + 1, square.Item2 + 1));
             }
             foreach ((int, int) square in lastShip)
             {
                 canBeShip[square.Item1, square.Item2] = 1;
             }
+            lastShip.Clear();
         }
 
         public void Start(GameSetting setting)
         {
             canBeShip = new int[setting.Height+2, setting.Width+2];
-            shipCount = setting.BoatCount;
+            shipCount = new int[setting.BoatCount.Length];
+            for (int i = 0; i < setting.BoatCount.Length; i++)
+            {
+                shipCount[i] = setting.BoatCount[i];
+            }
             missList = new List<(int, int)>();
             lastShot = (-1, -1);
             lastShip = new List<(int, int)>();
             dir = 'n';
             for (int i = 0; i < setting.Height+2; i++) 
             {
-                canBeShip[i, 0] = 0;
-                canBeShip[i, setting.Width + 1] = 0;
+                canBeShip[i, 0] = -1;
+                canBeShip[i, setting.Width + 1] = -1;
                 missList.Add((i, 0));
                 missList.Add((i, setting.Width + 1));
             }
             for (int i = 0; i < setting.Width + 2; i++)
             {
-                canBeShip[0, i] = 0;
-                canBeShip[setting.Height + 1, 0] = 0;
+                canBeShip[0, i] = -1;
+                canBeShip[setting.Height + 1, i] = -1;
                 missList.Add((0, i));
                 missList.Add((setting.Height + 1, i));
             }
