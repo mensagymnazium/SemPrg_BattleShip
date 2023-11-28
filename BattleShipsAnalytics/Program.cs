@@ -1,11 +1,12 @@
 ﻿using BattleShipEngine;
 using BattleShipStrategies.Default;
 using BattleShipStrategies.Slavek;
+using BattleShipStrategies.Max;
 
 
 var participants = new List<Participant>()
 {
-    new("Default", new DefaultBoardCreationStrategy(), new DefaultGameStrategy()),
+    new("Max", new Board_Creation_Max(), new Strategy_Max()),
     new("SmartRandom", new DefaultBoardCreationStrategy(), new SmartRandomStrategy()),
     //new("Interactive", new InteractiveBoardCreationStrategy(), new InteractiveGameStrategy())
 };
