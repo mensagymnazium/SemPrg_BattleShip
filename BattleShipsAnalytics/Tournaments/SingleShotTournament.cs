@@ -2,15 +2,11 @@
 
 namespace BattleShipsAnalytics.Tournaments;
 
-public class SingleShotTournament : ITournament
+public class SingleShotTournament : AbstractTournament
 {
-    private readonly List<Participant> _participants;
-    public SingleShotTournament(List<Participant> participants)
-    {
-        _participants = participants;
-    }
+    public SingleShotTournament(List<Participant> participants) : base(participants) {}
 
-    public void PlayAndPrint(GameSetting settings)
+    public override void PlayAndPrint(GameSetting settings)
     {
         //Setup scores
         var competitorsScores = new Dictionary<Participant, int>(); // Key: Participant, Value: How many moves it took to sink all boats
@@ -51,23 +47,5 @@ public class SingleShotTournament : ITournament
 
         //Final results
         DrawResultTable(competitorsScores);
-    }
-
-    private void DrawResultTable(Dictionary<Participant, int> competitorsScores)
-    {
-        //Final results
-        //Draw it as a table with -+| and stuff
-        const int nameWidth = 20;
-        const int totalWidth = 20;
-
-        Console.WriteLine("\nTotal amount of moves needed to solve all the opponents' boards:");
-        Console.WriteLine($"{"Name",-nameWidth}|{"Total",-totalWidth}");
-        Console.WriteLine($"{"".PadRight(nameWidth, '-')}+{"".PadRight(totalWidth, '-')}");
-        foreach (var participant in
-                 competitorsScores.OrderBy(x => x.Value))
-        {
-            Console.WriteLine(
-                $"{participant.Key.Name,-nameWidth}|{participant.Value,-totalWidth}");
-        }
     }
 }

@@ -9,6 +9,7 @@ using BattleShipStrategies.Slavek;
 using BattleShipStrategies.Robert;
 using BattleShipStrategies.Max;
 using BattleShipStrategies.Tobias;
+using BattleShipStrategies.Slavek.AI;
 
 
 var participants = new List<Participant>()
@@ -16,7 +17,8 @@ var participants = new List<Participant>()
 	new("MartinF", new MartinBoardCreationStrategy(), new MartinStrategy()),
     //new("Legit100%NoCap", new SmartRandomBoardCreationStrategy(), new MartinParasiticStrategy()),
     new("SmartRandom", new SmartRandomBoardCreationStrategy(), new SmartRandomStrategy()),
-	new("Slavek", new SuperSmartRandomBoardCreationStrategy(), new DeathCrossStrategy()),
+    new("Slavek", new SuperSmartRandomBoardCreationStrategy(), new DeathCrossStrategy()),
+    new("Slavek-AI", new SuperSmartRandomBoardCreationStrategy(), new AIGameStrategy()),
     //new("External", new ExternalBoardCreationStrategy(65431), new ExternalGameStrategy(65432)),
     //new("Honza", new HonzaBoardCreationStrategy(), new HonzaGameStrategy()),
     new("Robert_ChatGpt1", new SmartRandomBoardCreationStrategy(), new ChatGpt1GameStrategy()),
