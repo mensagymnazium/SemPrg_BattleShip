@@ -16,7 +16,7 @@ var participants = new List<Participant>()
     new("SmartRandom", new SmartRandomBoardCreationStrategy(), new SmartRandomStrategy()),
     new("Slavek", new SuperSmartRandomBoardCreationStrategy(), new DeathCrossStrategy()),
     //new("External", new ExternalBoardCreationStrategy(65431), new ExternalGameStrategy(65432)),
-    new("Honza", new HonzaBoardCreationStrategy(), new HonzaGameStrategy()),
+    //new("Honza", new HonzaBoardCreationStrategy(), new HonzaGameStrategy()),
 
     //new("Interactive", new InteractiveBoardCreationStrategy(), new InteractiveGameStrategy())
 };
