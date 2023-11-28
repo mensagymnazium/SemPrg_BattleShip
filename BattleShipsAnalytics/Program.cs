@@ -12,7 +12,7 @@ using BattleShipStrategies.Max;
 
 var participants = new List<Participant>()
 {
-	new("MartinF", new SmartRandomBoardCreationStrategy(), new MartinStrategy()),
+	new("MartinF", new MartinBoardCreationStrategy(), new MartinStrategy()),
     //new("Legit100%NoCap", new SmartRandomBoardCreationStrategy(), new MartinParasiticStrategy()),
     new("SmartRandom", new SmartRandomBoardCreationStrategy(), new SmartRandomStrategy()),
 	new("Slavek", new SuperSmartRandomBoardCreationStrategy(), new DeathCrossStrategy()),
