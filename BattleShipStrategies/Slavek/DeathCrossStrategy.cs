@@ -208,16 +208,25 @@ public class DeathCrossStrategy : IGameStrategy
     public void Start(GameSetting setting)
     {
         _board = new SlavekTile[setting.Width, setting.Height];
-        _setting = setting;
-        _defaultWorks = true;
-        _defaultPlaces = new DefaultBoardCreationStrategy().GetBoatPositions(setting).ToList();
-        _deathCross = new List<Int2>();
-        _hunter = false;
-        int mySum = Math.Min(setting.Width, setting.Height);
-        for (int i = 0; i < mySum; i++)
+        if (_setting != setting)
         {
-            _deathCross.Add(new Int2(i, i));
-            _deathCross.Add(new Int2(i, mySum - 1 - i));
+            _setting = setting;
+            _defaultPlaces = new DefaultBoardCreationStrategy().GetBoatPositions(setting).ToList();
+            _deathCross = new List<Int2>();
+            int mySum = Math.Min(setting.Width, setting.Height);
+            for (int i = 0; i < mySum; i++)
+            {
+                _deathCross.Add(new Int2(i, i));
+                _deathCross.Add(new Int2(i, mySum - 1 - i));
+            }
         }
+        _defaultWorks = true;
+        _hunter = false;
+    }
+
+    internal void SetEverything(SlavekTile[,] board)
+    {
+        _board = board;
+        _defaultWorks = false;
     }
 }

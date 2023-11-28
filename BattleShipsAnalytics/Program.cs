@@ -5,6 +5,7 @@ using BattleShipStrategies.Default;
 using BattleShipStrategies.MartinF;
 using BattleShipStrategies.MartinF.Unethical;
 using BattleShipStrategies.Slavek;
+using BattleShipStrategies.Slavek.AI;
 
 
 var participants = new List<Participant>()
@@ -13,6 +14,7 @@ var participants = new List<Participant>()
     //new("Legit100%NoCap", new SmartRandomBoardCreationStrategy(), new MartinParasiticStrategy()),
     new("SmartRandom", new SmartRandomBoardCreationStrategy(), new SmartRandomStrategy()),
     new("Slavek", new SuperSmartRandomBoardCreationStrategy(), new DeathCrossStrategy()),
+    new("Slavek-AI", new SuperSmartRandomBoardCreationStrategy(), new AIGameStrategy()),
     //new("External", new ExternalBoardCreationStrategy(65431), new ExternalGameStrategy(65432)),
     //new("Interactive", new InteractiveBoardCreationStrategy(), new InteractiveGameStrategy())
 };
