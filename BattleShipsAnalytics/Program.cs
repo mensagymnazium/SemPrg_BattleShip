@@ -15,16 +15,16 @@ var participants = new List<Participant>()
     new("SmartRandom", new SmartRandomBoardCreationStrategy(), new SmartRandomStrategy()),
     new("Slavek", new SuperSmartRandomBoardCreationStrategy(), new DeathCrossStrategy()),
     //new("External", new ExternalBoardCreationStrategy(65431), new ExternalGameStrategy(65432)),
-    new("Honza", new HonzaBoardCreationStrategy(), new HonzaGameStrategy()),
+    //new("Honza", new HonzaBoardCreationStrategy(), new HonzaGameStrategy()),
 
     //new("Interactive", new InteractiveBoardCreationStrategy(), new InteractiveGameStrategy())
 };
 
 var settings = GameSetting.Default;
 
-//var tournament = new SingleShotTournament(participants);
+var tournament = new SingleShotTournament(participants);
 //var tournament = new MultiGameTournament(participants, 1000);
-var tournament = new MultiThreadedTournament(participants, 1000); //Might be faster, but not sure (lol)
+//var tournament = new MultiThreadedTournament(participants, 1000); //Might be faster, but not sure (lol)
 
 tournament.PlayAndPrint(settings);
 
