@@ -21,9 +21,9 @@ var participants = new List<Participant>()
     new("Slavek-AI", new SuperSmartRandomBoardCreationStrategy(), new AIGameStrategy()),
     //new("External", new ExternalBoardCreationStrategy(65431), new ExternalGameStrategy(65432)),
     //new("Honza", new HonzaBoardCreationStrategy(), new HonzaGameStrategy()),
-    new("Robert_ChatGpt1", new SmartRandomBoardCreationStrategy(), new ChatGpt1GameStrategy()),
-	new("Robert_ChatGpt2", new SmartRandomBoardCreationStrategy(), new ChatGpt2GameStrategy()),
-	new("Robert_GitHubCopilot", new SmartRandomBoardCreationStrategy(), new GitHubCopilotGameStrategy()),
+    new("Robert+S_ChatGpt1", new ChatGptBoardCreationStrategy(), new ChatGpt1GameStrategy()),
+	new("Robert+S_ChatGpt2", new ChatGptBoardCreationStrategy(), new ChatGpt2GameStrategy()),
+	new("Robert+S_GHC+CGPT", new ChatGptBoardCreationStrategy(), new GitHubCopilotGameStrategy()),
     //new("Honza", new HonzaBoardCreationStrategy(), new HonzaGameStrategy()),
     new("Tobias", new TobiasBoardCreationStrategy(), new TobiasGameStrategy()),
 
