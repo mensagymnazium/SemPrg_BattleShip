@@ -1,20 +1,34 @@
 using BattleShipEngine;
 using BattleShipStrategies.MartinF;
+using BattleShipStrategies.Max;
+using BattleShipStrategies.Robert;
+using BattleShipStrategies.Slavek.AI;
 
 namespace BattleShipStrategies.Slavek;
 
 public class SuperSmartRandomBoardCreationStrategy : IBoardCreationStrategy
 {
+    private readonly string _name;
     private readonly IBoardCreationStrategy _smartStrategy;
-    private readonly List<IGameStrategy> _gameStrategies;
+    private readonly List<IGameStrategy> _enemyStrategies;
+    private readonly List<IGameStrategy> _allyStrategies;
     private readonly BoatPaster _paster = new BoatPaster();
 
-    public SuperSmartRandomBoardCreationStrategy()
+    public SuperSmartRandomBoardCreationStrategy(string name="Warrior")
     {
+        _name = name;
         _smartStrategy = new SmartRandomBoardCreationStrategy();
-        _gameStrategies = new List<IGameStrategy>();
-        _gameStrategies.Add(new DeathCrossStrategy());
-        _gameStrategies.Add(new MartinStrategy());
+        _enemyStrategies = new IGameStrategy[]
+        {
+            new MartinStrategy(),
+            //new Strategy_Max(),
+            new ChatGpt2GameStrategy()
+        }.ToList();
+        _allyStrategies = new List<IGameStrategy>();
+        if (name != "DeathCross")
+            _allyStrategies.Add(new DeathCrossStrategy());
+        if (name != "AI")
+            _allyStrategies.Add(new AIGameStrategy());
     }
     public Int2[] GetBoatPositions(GameSetting setting)
     {
@@ -26,9 +40,13 @@ public class SuperSmartRandomBoardCreationStrategy : IBoardCreationStrategy
             _paster.SetBoats(newResult);
             int newMoves = 0;
             Game game = new Game(_paster, setting);
-            foreach (var gameStrategy in _gameStrategies)
+            foreach (var gameStrategy in _enemyStrategies)
             {
                 newMoves += game.SimulateGame(gameStrategy);
+            }
+            foreach (var gameStrategy in _allyStrategies)
+            {
+                newMoves -= game.SimulateGame(gameStrategy);
             }
             if (newMoves > mostMoves)
             {
