@@ -15,6 +15,11 @@ public readonly record struct CoefficientMap(GameSetting Settings, double[,] Coe
         return map1;
     }
 
+    public CoefficientMap CloneCoefficients()
+    {
+        return this with {Coefficients = Coefficients.Clone() as double[,]};
+    }
+
     public override string ToString()
     {
         string result = "{";

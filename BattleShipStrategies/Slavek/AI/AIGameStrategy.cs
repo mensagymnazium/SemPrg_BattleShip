@@ -5,11 +5,12 @@ namespace BattleShipStrategies.Slavek.AI;
 public class AIGameStrategy : IGameStrategy
 {
     private CoefficientMap _map;
-    private SlavekTile[,] _board;
+    private SlavekTile[,] _board = new SlavekTile[0,0];
+    private List<Experiences> _possibleExperiences = new ();
     private Experiences _experiences;
     private GameSetting _setting;
     private Int2 _lastMove;
-    private DeathCrossStrategy _deathCrossStrategy = new DeathCrossStrategy();
+    private readonly DeathCrossStrategy _deathCrossStrategy = new DeathCrossStrategy();
     private bool _problems = false;
     
     public Int2 GetMove()
@@ -134,10 +135,32 @@ public class AIGameStrategy : IGameStrategy
 
     public void Start(GameSetting setting)
     {
+        _problems = false;
         _board = new SlavekTile[setting.Width, setting.Height];
-        _experiences = Experiences.DefaultSmartRandom();
-        _map = _experiences.InitialCoefficients;
+        
+        if (setting != _setting)
+        {
+            _possibleExperiences = new List<Experiences>();
+            foreach (Experiences experience in new[]
+                     {
+                         Experiences.DefaultSmartRandom(), Experiences.SmallSmartRandom(),
+                         Experiences.LargeSmartRandom(), Experiences.HasbroSmartRandom()
+                     })
+                if (GameSetting.AreSame(experience.Settings, setting))
+                    _possibleExperiences.Add(experience);
+            
+            _setting = setting;
+        }
+
+        if (_possibleExperiences.Count == 0)
+            _problems = true;
+        else
+        {
+
+            _experiences = _possibleExperiences[0];
+            _map = _experiences.InitialCoefficients.CloneCoefficients();
+        }
+
         _deathCrossStrategy.Start(setting);
-        _setting = setting;
     }
 }
