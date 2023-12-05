@@ -4,11 +4,12 @@ namespace BattleShipStrategies.Slavek.AI;
 
 public class AIGameStrategy : IGameStrategy
 {
-    private CoefficientMap _map;
     private SlavekTile[,] _board = new SlavekTile[0,0];
     private List<Experiences> _possibleExperiences = new ();
-    private Experiences _experiences;
+    private List<CoefficientMap> _possibleMaps = new ();
     private GameSetting _setting;
+    private List<double> _probabilities = new ();
+    private int _chosenMapIndex = 0;
     private Int2 _lastMove;
     private readonly DeathCrossStrategy _deathCrossStrategy = new DeathCrossStrategy();
     private bool _problems = false;
@@ -26,16 +27,44 @@ public class AIGameStrategy : IGameStrategy
     {
         double bestCoef = 0;
         Int2 bestMove = new Int2(0, 0);
+        
         for (int i = 0; i < _setting.Width; i++)
         for (int j = 0; j < _setting.Height; j++)
         {
-            if (_map.Coefficients[i, j] > bestCoef)
+            if (_possibleMaps[_chosenMapIndex].Coefficients[i, j] > bestCoef)
             {
                 bestMove = new Int2(i, j);
-                bestCoef = _map.Coefficients[i, j];
+                bestCoef = _possibleMaps[_chosenMapIndex].Coefficients[i, j];
             }
         }
-        return bestMove;
+
+        if (bestCoef > 0)
+            return bestMove;
+        
+        else
+        {
+            _probabilities[_chosenMapIndex] = 0;
+            if (!SetMap())
+            {
+                _problems = true;
+                _deathCrossStrategy.SetEverything(_board);
+                return _deathCrossStrategy.GetMove();
+            }
+            return Move();
+        }
+    }
+
+    private bool SetMap()
+    {
+        bool anyUsable = false;
+        for (int i = 0; i < _probabilities.Count; i++)
+        {
+            if (_probabilities[i] > 0)
+                anyUsable = true;
+            if (_probabilities[_chosenMapIndex] < _probabilities[i])
+                _chosenMapIndex = i;
+        }
+        return anyUsable;
     }
 
     public void RespondHit()
@@ -45,64 +74,48 @@ public class AIGameStrategy : IGameStrategy
             _deathCrossStrategy.RespondHit();
             return;
         }
-        _board[_lastMove.X, _lastMove.Y] = SlavekTile.DamagedBoat;
-        _map.Coefficients[_lastMove.X, _lastMove.Y] = 0;
-        CoefficientMap? change = _experiences.Changes[(_lastMove, SlavekTile.Boat)];
-        if (change is null)
+        if (!UpdateMaps(_lastMove, SlavekTile.Boat, true))
         {
             _problems = true;
             _deathCrossStrategy.SetEverything(_board);
         }
-        else
-            _map += (CoefficientMap) change;
     }
 
     public void RespondSunk()
     {
         for (int i = 0; i < 4; i++)
-            BoatIsDead(_lastMove, (Direction) i);
+            if (!BoatIsDead(_lastMove, (Direction) i))
+            {
+                _problems = true;
+                _deathCrossStrategy.SetEverything(_board);
+            }
     }
     
-    private void BoatIsDead(Int2 position, Direction direction)
+    private bool BoatIsDead(Int2 position, Direction direction)
     {
         if (direction == Direction.Left || direction == Direction.Right)
         {
             if (position.Y < _setting.Height - 1
                 && _board[position.X, position.Y + 1] == SlavekTile.Unknown)
-            {
-                _board[position.X, position.Y + 1] = SlavekTile.Water;
-                _map.Coefficients[position.X, position.Y + 1] = 0;
-            }
+                UpdateMaps(position with { Y = position.Y + 1 }, SlavekTile.Water);
             if (position.Y > 0
                 && _board[position.X, position.Y - 1] == SlavekTile.Unknown)
-            {
-                _board[position.X, position.Y - 1] = SlavekTile.Water;
-                _map.Coefficients[position.X, position.Y - 1] = 0;
-            }
+                UpdateMaps(position with { Y = position.Y - 1 }, SlavekTile.Water);
         }
         if (direction == Direction.Up || direction == Direction.Down)
         {
             if (position.X < _setting.Width - 1
                 && _board[position.X + 1, position.Y] == SlavekTile.Unknown)
-            {
-                _board[position.X + 1, position.Y] = SlavekTile.Water;
-                _map.Coefficients[position.X + 1, position.Y] = 0;
-            }
+                UpdateMaps(position with { X = position.X + 1 }, SlavekTile.Water);
             if (position.X > 0
                 && _board[position.X - 1, position.Y] == SlavekTile.Unknown)
-            {
-                _board[position.X - 1, position.Y] = SlavekTile.Water;
-                _map.Coefficients[position.X - 1, position.Y] = 0;
-            }
+                UpdateMaps(position with { X = position.X - 1 }, SlavekTile.Water);
         }
         
         if (_board[position.X, position.Y] == SlavekTile.Unknown)
-        {
-            _board[position.X, position.Y] = SlavekTile.Water;
-            _map.Coefficients[position.X, position.Y] = 0;
-        }
+            UpdateMaps(position, SlavekTile.Water);
         if (_board[position.X, position.Y] == SlavekTile.Water)
-            return;
+            return SetMap();
         
         if (position.X > 0 && direction == Direction.Left)
             BoatIsDead(position with {X = position.X - 1}, direction);
@@ -112,6 +125,8 @@ public class AIGameStrategy : IGameStrategy
             BoatIsDead(position with {Y = position.Y - 1}, direction);
         if (position.Y < _setting.Height - 1 && direction == Direction.Down)
             BoatIsDead(position with {Y = position.Y + 1}, direction);
+        
+        return SetMap();
     }
 
     public void RespondMiss()
@@ -121,16 +136,47 @@ public class AIGameStrategy : IGameStrategy
             _deathCrossStrategy.RespondMiss();
             return;
         }
-        _board[_lastMove.X, _lastMove.Y] = SlavekTile.Water;
-        _map.Coefficients[_lastMove.X, _lastMove.Y] = 0;
-        CoefficientMap? change = _experiences.Changes[(_lastMove, SlavekTile.Water)];
-        if (change is null)
+        if (!UpdateMaps(_lastMove, SlavekTile.Water, true))
         {
             _problems = true;
             _deathCrossStrategy.SetEverything(_board);
         }
-        else
-            _map += (CoefficientMap) change;
+    }
+
+    private void SetZero(Int2 position)
+    {
+        _board[position.X, position.Y] = SlavekTile.Water;
+        foreach (var map in _possibleMaps)
+            map.Coefficients[position.X, position.Y] = 0;
+    }
+
+    private bool UpdateMaps(Int2 position, SlavekTile result, bool alsoSetMap=false)
+    {
+        bool anyProbable = false;
+        for (int i = 0; i < _probabilities.Count; i++)
+        {
+            if (_probabilities[i] == 0)
+                continue;
+            if (result == SlavekTile.Boat)
+                _probabilities[i] *= _possibleMaps[i].Coefficients[position.X, position.Y];
+            else if (_possibleMaps[i].Coefficients[position.X, position.Y] < 1)
+                _probabilities[i] *= 1 - _possibleMaps[i].Coefficients[position.X, position.Y];
+            CoefficientMap? change = _possibleExperiences[i].Changes[(position, result)];
+            if (change is null)
+            {
+                _probabilities[i] = 0;
+                continue;
+            }
+            _possibleMaps[i] += (CoefficientMap) change;
+            anyProbable = true;
+        }
+
+        SetZero(position);
+        if (!anyProbable)
+            return false;
+        if (alsoSetMap)
+            SetMap();
+        return true;
     }
 
     public void Start(GameSetting setting)
@@ -141,25 +187,36 @@ public class AIGameStrategy : IGameStrategy
         if (setting != _setting)
         {
             _possibleExperiences = new List<Experiences>();
+            _possibleMaps = new List<CoefficientMap>();
+            _probabilities = new List<double>();
             foreach (Experiences experience in new[]
                      {
                          Experiences.DefaultSmartRandom(), Experiences.SmallSmartRandom(),
-                         Experiences.LargeSmartRandom(), Experiences.HasbroSmartRandom()
+                         Experiences.LargeSmartRandom(), Experiences.HasbroSmartRandom(),
+                         Experiences.DefaultMartin(), Experiences.DefaultDefault(),
+                         Experiences.DefaultMax(), Experiences.DefaultChatGPT()
                      })
                 if (GameSetting.AreSame(experience.Settings, setting))
+                {
                     _possibleExperiences.Add(experience);
+                    _possibleMaps.Add(experience.InitialCoefficients.CloneCoefficients());
+                    _probabilities.Add(1);
+                }
             
             _setting = setting;
         }
+        else
+            for (int i = 0; i < _probabilities.Count; i++)
+            {
+                _probabilities[i] = 1;
+                _possibleMaps[i] = _possibleExperiences[i]
+                    .InitialCoefficients.CloneCoefficients();
+            }
 
         if (_possibleExperiences.Count == 0)
             _problems = true;
         else
-        {
-
-            _experiences = _possibleExperiences[0];
-            _map = _experiences.InitialCoefficients.CloneCoefficients();
-        }
+            _chosenMapIndex = 0;
 
         _deathCrossStrategy.Start(setting);
     }
