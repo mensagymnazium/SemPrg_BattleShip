@@ -5,14 +5,25 @@ namespace BattleShipStrategies.Slavek.AI;
 public class AIGameStrategy : IGameStrategy
 {
     private SlavekTile[,] _board = new SlavekTile[0,0];
-    private List<Experiences> _possibleExperiences = new ();
-    private List<CoefficientMap> _possibleMaps = new ();
+    private readonly List<Experiences> _possibleExperiences = new ();
+    private readonly List<CoefficientMap> _possibleMaps = new ();
     private GameSetting _setting;
-    private List<double> _probabilities = new ();
+    private readonly List<double> _probabilities = new ();
     private int _chosenMapIndex = 0;
     private Int2 _lastMove;
     private readonly DeathCrossStrategy _deathCrossStrategy = new DeathCrossStrategy();
     private bool _problems = false;
+    protected Experiences[] experiencesToChose = new[]
+    {
+        Experiences.DefaultSmartRandom(), Experiences.SmallSmartRandom(),
+        Experiences.LargeSmartRandom(), Experiences.HasbroSmartRandom(),
+        Experiences.DefaultMartin(), Experiences.DefaultDefault(),
+        Experiences.DefaultMax(), Experiences.DefaultChatGPT(),
+        Experiences.HasbroMartin(), Experiences.HasbroDefault(),
+        Experiences.HasbroChatGPT(), Experiences.LargeMartin(),
+        Experiences.LargeDefault(), Experiences.LargeChatGPT(),
+        Experiences.SmallDefault(), Experiences.SmallChatGPT(),
+    };
     
     public Int2 GetMove()
     {
@@ -186,20 +197,10 @@ public class AIGameStrategy : IGameStrategy
         
         if (setting != _setting)
         {
-            _possibleExperiences = new List<Experiences>();
-            _possibleMaps = new List<CoefficientMap>();
-            _probabilities = new List<double>();
-            foreach (Experiences experience in new[]
-                     {
-                         Experiences.DefaultSmartRandom(), Experiences.SmallSmartRandom(),
-                         Experiences.LargeSmartRandom(), Experiences.HasbroSmartRandom(),
-                         Experiences.DefaultMartin(), Experiences.DefaultDefault(),
-                         Experiences.DefaultMax(), Experiences.DefaultChatGPT(),
-                         Experiences.HasbroMartin(), Experiences.HasbroDefault(),
-                         Experiences.HasbroChatGPT(), Experiences.LargeMartin(),
-                         Experiences.LargeDefault(), Experiences.LargeChatGPT(),
-                         Experiences.SmallDefault(), Experiences.SmallChatGPT(),
-                     })
+            _possibleExperiences.Clear();
+            _possibleMaps.Clear();
+            _probabilities.Clear();
+            foreach (Experiences experience in experiencesToChose)
                 if (GameSetting.AreSame(experience.Settings, setting))
                 {
                     _possibleExperiences.Add(experience);

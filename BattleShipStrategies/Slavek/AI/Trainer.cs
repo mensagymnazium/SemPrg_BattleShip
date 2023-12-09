@@ -23,7 +23,6 @@ public class Trainer
         }
 
         double[,] probabilities = new double[settings.Width, settings.Height];
-        int[,] a = new int[3,2] { {0, 1}, {1, 2}, {0, 0} };
         for (int x = 0; x < settings.Width; x++)
         for (int y = 0; y < settings.Height; y++)
         {
