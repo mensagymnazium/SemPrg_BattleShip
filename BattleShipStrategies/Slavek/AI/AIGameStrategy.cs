@@ -194,7 +194,11 @@ public class AIGameStrategy : IGameStrategy
                          Experiences.DefaultSmartRandom(), Experiences.SmallSmartRandom(),
                          Experiences.LargeSmartRandom(), Experiences.HasbroSmartRandom(),
                          Experiences.DefaultMartin(), Experiences.DefaultDefault(),
-                         Experiences.DefaultMax(), Experiences.DefaultChatGPT()
+                         Experiences.DefaultMax(), Experiences.DefaultChatGPT(),
+                         Experiences.HasbroMartin(), Experiences.HasbroDefault(),
+                         Experiences.HasbroChatGPT(), Experiences.LargeMartin(),
+                         Experiences.LargeDefault(), Experiences.LargeChatGPT(),
+                         Experiences.SmallDefault(), Experiences.SmallChatGPT(),
                      })
                 if (GameSetting.AreSame(experience.Settings, setting))
                 {
