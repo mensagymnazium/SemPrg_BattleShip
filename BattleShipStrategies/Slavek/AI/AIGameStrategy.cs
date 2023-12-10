@@ -178,7 +178,7 @@ public class AIGameStrategy : IGameStrategy
                 _probabilities[i] = 0;
                 continue;
             }
-            _possibleMaps[i] += (CoefficientMap) change;
+            _possibleMaps[i] *= (CoefficientMap) change;
             anyProbable = true;
         }
 

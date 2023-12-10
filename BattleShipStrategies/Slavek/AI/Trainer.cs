@@ -83,7 +83,7 @@ public class Trainer
         stream.Write(utf.GetBytes(
             "using BattleShipEngine;\n\n" +
             "namespace BattleShipStrategies.Slavek.AI;\n\n" +
-            "public readonly partial record struct Experiences\n" +
+            "public partial record struct Experiences\n" +
             "{\n" +
             "    public static Experiences " + name + "()\n" +
             "    {\n"));
@@ -103,7 +103,8 @@ public class Trainer
         stream.Write(utf.GetBytes(
             "        Experiences e = new Experiences(\"" + name + "\", s,\n" +
             "            new CoefficientMap(s, new double[,] \n"
-            + experiences.InitialCoefficients.ToString() + "),\n" +
+            + experiences.InitialCoefficients.ToString() + ",\n"
+            + experiences.InitialCoefficients.HowSure.ToString() + "),\n" +
             "            new Dictionary<(Int2,SlavekTile),CoefficientMap?>());\n"));
 
         foreach (var change in experiences.Changes)
@@ -115,12 +116,15 @@ public class Trainer
                     "SlavekTile." + change.Key.Item2.ToString() + 
                     ", null);\n"));
             else
+            {
+                CoefficientMap map = (CoefficientMap) change.Value;
                 stream.Write(utf.GetBytes(
                     "        e.AddChange(new Int2(" 
                     + change.Key.Item1.X + "," + change.Key.Item1.Y + ")," +
                     "SlavekTile." + change.Key.Item2.ToString() + 
                     ", new CoefficientMap(s, new double[,] \n" 
-                    + change.Value.ToString() + "));\n"));
+                    + map.ToString() + ",\n" + map.HowSure.ToString() + "));\n"));
+            }
         }
         
         stream.Write(utf.GetBytes(
@@ -134,5 +138,46 @@ public class Trainer
         GameSetting settings, int boardCount)
     {
         WriteToData(name, Train(name, strategy, settings, boardCount));
+    }
+
+    public static void CreateNew(string name, GameSetting settings)
+    {
+        double[,] probabilities = new double[settings.Width, settings.Height];
+        for (int w = 0; w < settings.Width; w++)
+        for (int h = 0; h < settings.Height; h++)
+            probabilities[w, h] = 0.2;
+        Experiences experiences = new Experiences(name, settings,
+            new CoefficientMap(settings, probabilities, 10),
+            new Dictionary<(Int2, SlavekTile), CoefficientMap?>());
+
+        for (int w = 0; w < settings.Width; w++)
+        for (int h = 0; h < settings.Height; h++)
+        {
+            probabilities = new double[settings.Width, settings.Height];
+            for (int x = 0; x < settings.Width; x++)
+            for (int y = 0; y < settings.Height; y++)
+                if (Math.Abs(w - x) + Math.Abs(h - y) == 0)
+                    probabilities[x, y] = 5;
+                else if (Math.Abs(w - x) + Math.Abs(h - y) == 1)
+                    probabilities[x, y] = 2;
+                else if (Math.Abs(w - x) == 1 && Math.Abs(h - y) == 1)
+                    probabilities[x, y] = 0;
+                else
+                    probabilities[x, y] = 1;
+            experiences.AddChange(new Int2(w, h), SlavekTile.Boat,
+                new CoefficientMap(settings, probabilities, 2));
+            
+            probabilities = new double[settings.Width, settings.Height];
+            for (int x = 0; x < settings.Width; x++)
+            for (int y = 0; y < settings.Height; y++)
+                if (Math.Abs(w - x) + Math.Abs(h - y) == 0)
+                    probabilities[x, y] = 0;
+                else
+                    probabilities[x, y] = 1;
+            experiences.AddChange(new Int2(w, h), SlavekTile.Water,
+                new CoefficientMap(settings, probabilities, 8));
+        }
+        
+        WriteToData(name, experiences);
     }
 }

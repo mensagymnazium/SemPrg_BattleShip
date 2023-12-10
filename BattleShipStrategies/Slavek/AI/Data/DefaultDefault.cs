@@ -2,7 +2,7 @@ using BattleShipEngine;
 
 namespace BattleShipStrategies.Slavek.AI;
 
-public readonly partial record struct Experiences
+public partial record struct Experiences
 {
     public static Experiences DefaultDefault()
     {
