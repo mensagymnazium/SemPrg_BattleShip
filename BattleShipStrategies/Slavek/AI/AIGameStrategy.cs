@@ -4,10 +4,10 @@ namespace BattleShipStrategies.Slavek.AI;
 
 public class AIGameStrategy : IGameStrategy
 {
-    private SlavekTile[,] _board = new SlavekTile[0,0];
-    private readonly List<Experiences> _possibleExperiences = new ();
+    protected SlavekTile[,] _board = new SlavekTile[0,0];
+    protected readonly List<Experiences> _possibleExperiences = new ();
     private readonly List<CoefficientMap> _possibleMaps = new ();
-    private GameSetting _setting;
+    protected GameSetting _setting;
     private readonly List<double> _probabilities = new ();
     private int _chosenMapIndex;
     private Int2 _lastMove;
@@ -190,7 +190,7 @@ public class AIGameStrategy : IGameStrategy
         return true;
     }
 
-    public void Start(GameSetting setting)
+    public virtual void Start(GameSetting setting)
     {
         _problems = false;
         _board = new SlavekTile[setting.Width, setting.Height];
