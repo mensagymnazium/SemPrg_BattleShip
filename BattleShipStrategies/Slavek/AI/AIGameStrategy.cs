@@ -9,10 +9,10 @@ public class AIGameStrategy : IGameStrategy
     private readonly List<CoefficientMap> _possibleMaps = new ();
     private GameSetting _setting;
     private readonly List<double> _probabilities = new ();
-    private int _chosenMapIndex = 0;
+    private int _chosenMapIndex;
     private Int2 _lastMove;
     private readonly DeathCrossStrategy _deathCrossStrategy = new DeathCrossStrategy();
-    private bool _problems = false;
+    private bool _problems;
     protected Experiences[] experiencesToChose = new[]
     {
         Experiences.DefaultSmartRandom(), Experiences.SmallSmartRandom(),
@@ -154,9 +154,9 @@ public class AIGameStrategy : IGameStrategy
         }
     }
 
-    private void SetZero(Int2 position)
+    private void SetZero(Int2 position, SlavekTile result)
     {
-        _board[position.X, position.Y] = SlavekTile.Water;
+        _board[position.X, position.Y] = result;
         foreach (var map in _possibleMaps)
             map.Coefficients[position.X, position.Y] = 0;
     }
@@ -182,7 +182,7 @@ public class AIGameStrategy : IGameStrategy
             anyProbable = true;
         }
 
-        SetZero(position);
+        SetZero(position, result);
         if (!anyProbable)
             return false;
         if (alsoSetMap)
