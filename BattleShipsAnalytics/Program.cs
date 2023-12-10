@@ -19,7 +19,7 @@ var participants = new List<Participant>()
     new("SmartRandom", new SmartRandomBoardCreationStrategy(), new SmartRandomStrategy()),
     new("Slavek", new SuperSmartRandomBoardCreationStrategy("DeathCross"), new DeathCrossStrategy()),
     new("Slavek-AI", new SuperSmartRandomBoardCreationStrategy("AI"), new AIGameStrategy()),
-    new("Slavek-LAI", new SmartRandomBoardCreationStrategy(), new LearningAIGameStrategy()),
+    new("Slavek-LAI", new SuperSmartRandomBoardCreationStrategy(), new LearningAIGameStrategy()),
     //new("External", new ExternalBoardCreationStrategy(65431), new ExternalGameStrategy(65432)),
     //new("Honza", new HonzaBoardCreationStrategy(), new HonzaGameStrategy()),
     new("Robert+S_ChatGpt1", new ChatGptBoardCreationStrategy(), new ChatGpt1GameStrategy()),
@@ -46,9 +46,11 @@ foreach (Participant participant in participants)
 	if (participant.GameStrategy is ExternalGameStrategy)
 		participant.GameStrategy.Start(new GameSetting(
 			0, 0, new int[] { }));
+/*
 	else if (participant.GameStrategy is LearningAIGameStrategy)
 		participant.GameStrategy.Start(new GameSetting(
 			0, 0, new int[] { }));
+*/
 
 	if (participant.BoardCreationStrategy is ExternalBoardCreationStrategy)
 		participant.BoardCreationStrategy.GetBoatPositions(
