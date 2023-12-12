@@ -4,15 +4,26 @@ namespace BattleShipStrategies.Slavek.AI;
 
 public class AIGameStrategy : IGameStrategy
 {
-    private SlavekTile[,] _board = new SlavekTile[0,0];
-    private List<Experiences> _possibleExperiences = new ();
-    private List<CoefficientMap> _possibleMaps = new ();
-    private GameSetting _setting;
-    private List<double> _probabilities = new ();
-    private int _chosenMapIndex = 0;
+    protected SlavekTile[,] _board = new SlavekTile[0,0];
+    protected readonly List<Experiences> _possibleExperiences = new ();
+    private readonly List<CoefficientMap> _possibleMaps = new ();
+    protected GameSetting _setting;
+    private readonly List<double> _probabilities = new ();
+    private int _chosenMapIndex;
     private Int2 _lastMove;
     private readonly DeathCrossStrategy _deathCrossStrategy = new DeathCrossStrategy();
-    private bool _problems = false;
+    private bool _problems;
+    protected Experiences[] experiencesToChose = new[]
+    {
+        Experiences.DefaultSmartRandom(), Experiences.SmallSmartRandom(),
+        Experiences.LargeSmartRandom(), Experiences.HasbroSmartRandom(),
+        Experiences.DefaultMartin(), Experiences.DefaultDefault(),
+        Experiences.DefaultMax(), Experiences.DefaultChatGPT(),
+        Experiences.HasbroMartin(), Experiences.HasbroDefault(),
+        Experiences.HasbroChatGPT(), Experiences.LargeMartin(),
+        Experiences.LargeDefault(), Experiences.LargeChatGPT(),
+        Experiences.SmallDefault(), Experiences.SmallChatGPT(),
+    };
     
     public Int2 GetMove()
     {
@@ -143,9 +154,9 @@ public class AIGameStrategy : IGameStrategy
         }
     }
 
-    private void SetZero(Int2 position)
+    private void SetZero(Int2 position, SlavekTile result)
     {
-        _board[position.X, position.Y] = SlavekTile.Water;
+        _board[position.X, position.Y] = result;
         foreach (var map in _possibleMaps)
             map.Coefficients[position.X, position.Y] = 0;
     }
@@ -167,11 +178,11 @@ public class AIGameStrategy : IGameStrategy
                 _probabilities[i] = 0;
                 continue;
             }
-            _possibleMaps[i] += (CoefficientMap) change;
+            _possibleMaps[i] *= (CoefficientMap) change;
             anyProbable = true;
         }
 
-        SetZero(position);
+        SetZero(position, result);
         if (!anyProbable)
             return false;
         if (alsoSetMap)
@@ -179,23 +190,17 @@ public class AIGameStrategy : IGameStrategy
         return true;
     }
 
-    public void Start(GameSetting setting)
+    public virtual void Start(GameSetting setting)
     {
         _problems = false;
         _board = new SlavekTile[setting.Width, setting.Height];
         
         if (setting != _setting)
         {
-            _possibleExperiences = new List<Experiences>();
-            _possibleMaps = new List<CoefficientMap>();
-            _probabilities = new List<double>();
-            foreach (Experiences experience in new[]
-                     {
-                         Experiences.DefaultSmartRandom(), Experiences.SmallSmartRandom(),
-                         Experiences.LargeSmartRandom(), Experiences.HasbroSmartRandom(),
-                         Experiences.DefaultMartin(), Experiences.DefaultDefault(),
-                         Experiences.DefaultMax(), Experiences.DefaultChatGPT()
-                     })
+            _possibleExperiences.Clear();
+            _possibleMaps.Clear();
+            _probabilities.Clear();
+            foreach (Experiences experience in experiencesToChose)
                 if (GameSetting.AreSame(experience.Settings, setting))
                 {
                     _possibleExperiences.Add(experience);

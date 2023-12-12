@@ -5,12 +5,12 @@ namespace BattleShipStrategies.Slavek;
 
 public class DeathCrossStrategy : IGameStrategy
 {
-    private List<Int2> _defaultPlaces;
+    private List<Int2> _defaultPlaces = new();
     private bool _defaultWorks;
-    private SlavekTile[,] _board;
+    private SlavekTile[,] _board = new SlavekTile[0,0];
     private GameSetting _setting;
     private Int2 _lastMove;
-    private List<Int2> _deathCross;
+    private readonly List<Int2> _deathCross = new();
     private bool _hunter;
     private (Int2 from, Int2 to) _bleeding;
 
@@ -18,9 +18,6 @@ public class DeathCrossStrategy : IGameStrategy
     {
         Int2 move = Move();
         _lastMove = move;
-        //if (_deathCross.Contains(move)) _deathCross.Remove(move);
-        //if (_defaultPlaces.Contains(move)) _defaultPlaces.Remove(move);
-        //Console.WriteLine($"{move.X}, {move.Y}");
         return move;
     }
 
@@ -59,14 +56,6 @@ public class DeathCrossStrategy : IGameStrategy
             } 
         }
 
-        /*if (_defaultWorks)
-            return _defaultPlaces.OrderBy(i => _board[i.X, i.Y] == SlavekTile.Unknown)
-                .ThenBy(x => _deathCross.Contains(x))
-                .FirstOrDefault();
-        Int2 move = _deathCross.OrderBy(i => _board[i.X, i.Y] == SlavekTile.Unknown)
-            .FirstOrDefault();
-        if (_board[move.X, move.Y] == SlavekTile.Unknown)
-            return move;*/
         Int2 best = new Int2(0, 0);
         int coef = 0;
         if (_defaultWorks)
@@ -212,7 +201,7 @@ public class DeathCrossStrategy : IGameStrategy
         {
             _setting = setting;
             _defaultPlaces = new DefaultBoardCreationStrategy().GetBoatPositions(setting).ToList();
-            _deathCross = new List<Int2>();
+            _deathCross.Clear();
             int mySum = Math.Min(setting.Width, setting.Height);
             for (int i = 0; i < mySum; i++)
             {
