@@ -10,6 +10,7 @@ using BattleShipStrategies.Robert;
 using BattleShipStrategies.Max;
 using BattleShipStrategies.Tobias;
 using BattleShipStrategies.Slavek.AI;
+using BattleShipStrategies.Klara;
 
 
 var participants = new List<Participant>()
@@ -28,6 +29,7 @@ var participants = new List<Participant>()
 	new("Robert+S_GHC+CGPT", new ChatGptBoardCreationStrategy(), new GitHubCopilotGameStrategy()),
     //new("Honza", new HonzaBoardCreationStrategy(), new HonzaGameStrategy()),
     new("Tobias", new TobiasBoardCreationStrategy(), new TobiasGameStrategy()),
+	new("Klara", new DefaultBoardCreationStrategy(), new KlaraStrategy()),
 
     //new("Interactive", new InteractiveBoardCreationStrategy(), new InteractiveGameStrategy())
 };
