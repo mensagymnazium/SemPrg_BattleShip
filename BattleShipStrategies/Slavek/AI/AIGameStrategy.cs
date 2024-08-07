@@ -23,7 +23,7 @@ public class AIGameStrategy : IGameStrategy
         Experiences.HasbroChatGPT(), Experiences.LargeMartin(),
         Experiences.LargeDefault(), Experiences.LargeChatGPT(),
         Experiences.SmallDefault(), Experiences.SmallChatGPT(),
-        Experiences.DefaultKuba()
+        Experiences.DefaultKuba(), Experiences.DefaultMarMaxSDC(),
     };
     
     public Int2 GetMove()
