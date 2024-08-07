@@ -5,6 +5,21 @@ namespace BattleShipStrategies.Slavek.AI;
 public partial record struct Experiences(string StrategyName, GameSetting Settings,
     CoefficientMap InitialCoefficients, Dictionary<(Int2, SlavekTile), CoefficientMap?> Changes)
 {
+    public static Experiences Blank(string name, GameSetting setting)
+    {
+        double[,] coefficients = new double[setting.Width, setting.Height];
+        Dictionary<(Int2, SlavekTile), CoefficientMap?> changes = new();
+        for (int i = 0; i < setting.Width; i++)
+            for (int j = 0; j < setting.Height; j++)
+            {
+                changes[(new Int2(i, j), SlavekTile.Boat)] = null;
+                changes[(new Int2(i, j), SlavekTile.Water)] = null;
+                coefficients[i, j] = 0.2;
+            }
+        return new Experiences(name, setting, 
+            new CoefficientMap(setting, coefficients, 0), changes);
+    }
+    
     public void AddChange(Int2 position, SlavekTile shot, CoefficientMap? changeMap)
     {
         Changes.Add((position, shot), changeMap);
