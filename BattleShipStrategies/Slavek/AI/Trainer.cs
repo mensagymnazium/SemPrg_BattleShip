@@ -3,7 +3,7 @@ using BattleShipEngine;
 
 namespace BattleShipStrategies.Slavek.AI;
 
-public class Trainer
+public static class Trainer
 {
     public static Experiences Train(string name, IBoardCreationStrategy strategy,
         GameSetting settings, int boardCount)

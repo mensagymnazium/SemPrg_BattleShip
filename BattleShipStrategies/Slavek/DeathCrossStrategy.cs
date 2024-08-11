@@ -5,8 +5,8 @@ namespace BattleShipStrategies.Slavek;
 
 public class DeathCrossStrategy : IGameStrategy
 {
-    private List<Int2> _defaultPlaces = new();
-    private bool _defaultWorks;
+    private readonly List<List<Int2>> _stablePlaces = new();
+    private readonly List<IBoardCreationStrategy> _stableStrategies;
     private SlavekTile[,] _board = new SlavekTile[0,0];
     private GameSetting _setting;
     private Int2 _lastMove;
@@ -14,6 +14,16 @@ public class DeathCrossStrategy : IGameStrategy
     private bool _hunter;
     private (Int2 from, Int2 to) _bleeding;
 
+    public DeathCrossStrategy()
+    {
+        _stableStrategies = new();
+    }
+
+    public DeathCrossStrategy(List<IBoardCreationStrategy> strategies)
+    {
+        _stableStrategies = strategies;
+    }
+    
     public Int2 GetMove()
     {
         Int2 move = Move();
@@ -25,16 +35,30 @@ public class DeathCrossStrategy : IGameStrategy
     {
         if (_hunter)
         {
-            if (_defaultWorks)
+            for (int i = _stablePlaces.Count - 1; i >= 0; i--)
+                if (!((_bleeding.from.Y > 0 && _stablePlaces[i].Contains(
+                        _bleeding.from with { Y = _bleeding.from.Y - 1 }))
+                      || (_bleeding.to.Y < _setting.Height - 1 && _stablePlaces[i].Contains(
+                          _bleeding.to with { Y = _bleeding.to.Y + 1 }))
+                      || (_bleeding.from.X > 0 && _stablePlaces[i].Contains(
+                          _bleeding.from with { X = _bleeding.from.X - 1 }))
+                      || (_bleeding.to.X < _setting.Width - 1 && _stablePlaces[i].Contains(
+                          _bleeding.to with { X = _bleeding.to.X + 1 }))))
+                    _stablePlaces.RemoveAt(i);
+            if (_stablePlaces.Any())
             {
-                if (_bleeding.from.Y > 0 && _defaultPlaces.Contains(
+                if (_bleeding.from.Y > 0 && _stablePlaces[0].Contains(
                         _bleeding.from with { Y = _bleeding.from.Y - 1 }))
                     return _bleeding.from with { Y = _bleeding.from.Y - 1 };
-                else if (_bleeding.to.Y < _setting.Height - 1 && _defaultPlaces.Contains(
+                if (_bleeding.to.Y < _setting.Height - 1 && _stablePlaces[0].Contains(
                              _bleeding.to with { Y = _bleeding.to.Y + 1 }))
                     return _bleeding.to with { Y = _bleeding.to.Y + 1 };
-                else
-                    _defaultWorks = false;
+                if (_bleeding.from.X > 0 && _stablePlaces[0].Contains(
+                        _bleeding.from with { X = _bleeding.from.X - 1 }))
+                    return _bleeding.from with { X = _bleeding.from.X - 1 };
+                if (_bleeding.to.X < _setting.Width - 1 && _stablePlaces[0].Contains(
+                        _bleeding.to with { X = _bleeding.to.X + 1 }))
+                    return _bleeding.to with { X = _bleeding.to.X + 1 };
             }
             if (_bleeding.from == _bleeding.to || _bleeding.from.Y == _bleeding.to.Y)
             {
@@ -58,27 +82,18 @@ public class DeathCrossStrategy : IGameStrategy
 
         Int2 best = new Int2(0, 0);
         int coef = 0;
-        if (_defaultWorks)
+        for (int i = 0; i < _setting.Width; i++)
+        for (int j = 0; j < _setting.Height; j++)
         {
-            foreach (var place in _defaultPlaces)
-            {
-                int newCoef = 1;
-                if (_board[place.X, place.Y] != SlavekTile.Unknown)
-                    continue;
-                if (_deathCross.Contains(place))
-                    newCoef++;
-                if (newCoef > coef)
-                {
-                    coef = newCoef;
-                    best = place;
-                }
-            }
-        }
-        foreach (var place in _deathCross)
-        {
-            int newCoef = 1;
-            if (_board[place.X, place.Y] != SlavekTile.Unknown)
+            if (_board[i, j] != SlavekTile.Unknown)
                 continue;
+            Int2 place = new Int2(i, j);
+            int newCoef = 0;
+            if (_deathCross.Contains(place))
+                newCoef++;
+            foreach (List<Int2> places in _stablePlaces)
+                if (places.Contains(place))
+                    newCoef+=2;
             if (newCoef > coef)
             {
                 coef = newCoef;
@@ -190,8 +205,15 @@ public class DeathCrossStrategy : IGameStrategy
     {
         //Console.WriteLine("Miss.");
         _board[_lastMove.X, _lastMove.Y] = SlavekTile.Water;
-        if (_defaultWorks)
-            _defaultWorks = false;
+        if (_stablePlaces.Any())
+        {
+            List<List<Int2>> toRemove = new();
+            foreach (List<Int2> places in _stablePlaces)
+                if (places.Contains(_lastMove))
+                    toRemove.Add(places);
+            foreach (List<Int2> places in toRemove)
+                _stablePlaces.Remove(places);
+        }
     }
 
     public void Start(GameSetting setting)
@@ -200,7 +222,6 @@ public class DeathCrossStrategy : IGameStrategy
         if (_setting != setting)
         {
             _setting = setting;
-            _defaultPlaces = new DefaultBoardCreationStrategy().GetBoatPositions(setting).ToList();
             _deathCross.Clear();
             int mySum = Math.Min(setting.Width, setting.Height);
             for (int i = 0; i < mySum; i++)
@@ -209,13 +230,15 @@ public class DeathCrossStrategy : IGameStrategy
                 _deathCross.Add(new Int2(i, mySum - 1 - i));
             }
         }
-        _defaultWorks = true;
+        _stablePlaces.Clear();
+        for (int i = 0; i < _stableStrategies.Count; i++)
+            _stablePlaces.Add(_stableStrategies[i].GetBoatPositions(setting).ToList());
         _hunter = false;
     }
 
     internal void SetEverything(SlavekTile[,] board)
     {
         _board = board;
-        _defaultWorks = false;
+        _stablePlaces.Clear();
     }
 }

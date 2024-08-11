@@ -61,7 +61,16 @@ public sealed class Game
             if (ammOfMoves >= _setting.Width * _setting.Height * 5)
                 return _setting.Width * _setting.Height * 5;
 
-            var move = strategy.GetMove();
+            Int2 move;
+            try
+            {
+                move = strategy.GetMove();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Exception occured during the move. Strategy gets maximum moves.");
+                return _setting.Width * _setting.Height * 5;
+            }
             if (0 > move.X || move.X >= _setting.Width)
             {
                 Console.WriteLine("Invalid move. Strategy gets maximum moves.");

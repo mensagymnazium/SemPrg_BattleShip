@@ -1,7 +1,7 @@
 using BattleShipEngine;
 using BattleShipStrategies.MartinF;
 using BattleShipStrategies.Max;
-using BattleShipStrategies.Robert;
+using BattleShipStrategies.Kuba;
 using BattleShipStrategies.Slavek.AI;
 
 namespace BattleShipStrategies.Slavek;
@@ -21,14 +21,17 @@ public class SuperSmartRandomBoardCreationStrategy : IBoardCreationStrategy
         _enemyStrategies = new IGameStrategy[]
         {
             new MartinStrategy(),
-            //new Strategy_Max(),
-            new ChatGpt2GameStrategy()
+            new Strategy_Max(),
+            new KubaStrategie()
         }.ToList();
         _allyStrategies = new List<IGameStrategy>();
-        if (name != "DeathCross")
-            _allyStrategies.Add(new DeathCrossStrategy());
-        if (name != "AI")
-            _allyStrategies.Add(new AIGameStrategy());
+        if (name != "Solo")
+        {
+            if (name != "DeathCross")
+                _allyStrategies.Add(new DeathCrossStrategy());
+            if (name != "AI")
+                _allyStrategies.Add(new AIGameStrategy());
+        }
     }
     public Int2[] GetBoatPositions(GameSetting setting)
     {

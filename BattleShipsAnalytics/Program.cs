@@ -11,25 +11,29 @@ using BattleShipStrategies.Max;
 using BattleShipStrategies.Tobias;
 using BattleShipStrategies.Slavek.AI;
 using BattleShipStrategies.Klara;
+using BattleShipStrategies.Kuba;
 
+List<IBoardCreationStrategy> strategies = new();
+strategies.Add(new DefaultBoardCreationStrategy());
+strategies.Add(new AIBoard(PreparedMap.MapSmaDef_MarKubMax()));
 
 var participants = new List<Participant>()
 {
 	new("MartinF", new MartinBoardCreationStrategy(), new MartinStrategy()),
     //new("Legit100%NoCap", new SmartRandomBoardCreationStrategy(), new MartinParasiticStrategy()),
     new("SmartRandom", new SmartRandomBoardCreationStrategy(), new SmartRandomStrategy()),
-    new("Slavek", new SuperSmartRandomBoardCreationStrategy("DeathCross"), new DeathCrossStrategy()),
-    new("Slavek-AI", new SuperSmartRandomBoardCreationStrategy("AI"), new AIGameStrategy()),
-    new("Slavek-LAI", new SuperSmartRandomBoardCreationStrategy(), new LearningAIGameStrategy()),
+    new("Slavek", new AIBoard(PreparedMap.MapSmaDef_MarKubMax()), new DeathCrossStrategy(strategies)),
+    new("Slavek-AI", new AIBoard(PreparedMap.MapSmaDef_MarKubMax()), new AIGameStrategy()),
+    new("Slavek-LAI", new AIBoard(PreparedMap.MapSmaDef_MarKubMax()), new LearningAIGameStrategy(100)),
 	new("Kuba" , new KubaBoardCreationStrategy () , new KubaStrategie()),
     //new("External", new ExternalBoardCreationStrategy(65431), new ExternalGameStrategy(65432)),
-    //new("Honza", new HonzaBoardCreationStrategy(), new HonzaGameStrategy()),
+    new("Honza", new ChatGptBoardCreationStrategy(), new HonzaGameStrategy()),
     new("Robert+S_ChatGpt1", new ChatGptBoardCreationStrategy(), new ChatGpt1GameStrategy()),
 	new("Robert+S_ChatGpt2", new ChatGptBoardCreationStrategy(), new ChatGpt2GameStrategy()),
 	new("Robert+S_GHC+CGPT", new ChatGptBoardCreationStrategy(), new GitHubCopilotGameStrategy()),
-    //new("Honza", new HonzaBoardCreationStrategy(), new HonzaGameStrategy()),
     new("Tobias", new TobiasBoardCreationStrategy(), new TobiasGameStrategy()),
 	new("Klara", new DefaultBoardCreationStrategy(), new KlaraStrategy()),
+	new("Max", new Board_Creation_Max(), new Strategy_Max()),
 
     //new("Interactive", new InteractiveBoardCreationStrategy(), new InteractiveGameStrategy())
 };
