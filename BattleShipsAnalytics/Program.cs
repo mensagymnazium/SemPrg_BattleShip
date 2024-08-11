@@ -13,15 +13,18 @@ using BattleShipStrategies.Slavek.AI;
 using BattleShipStrategies.Klara;
 using BattleShipStrategies.Kuba;
 
+List<IBoardCreationStrategy> strategies = new();
+strategies.Add(new DefaultBoardCreationStrategy());
+strategies.Add(new AIBoard(PreparedMap.MapSmaDef_MarKubMax()));
 
 var participants = new List<Participant>()
 {
 	new("MartinF", new MartinBoardCreationStrategy(), new MartinStrategy()),
     //new("Legit100%NoCap", new SmartRandomBoardCreationStrategy(), new MartinParasiticStrategy()),
     new("SmartRandom", new SmartRandomBoardCreationStrategy(), new SmartRandomStrategy()),
-    new("Slavek", new SuperSmartRandomBoardCreationStrategy("DeathCross"), new DeathCrossStrategy()),
-    new("Slavek-AI", new AIBoard(PreparedMap.MapSmaDef_MarMax_SDC()), new AIGameStrategy()),
-    new("Slavek-LAI", new AIBoard(PreparedMap.MapSmaDef_MarMax_SDC()), new LearningAIGameStrategy(100)),
+    new("Slavek", new AIBoard(PreparedMap.MapSmaDef_MarKubMax()), new DeathCrossStrategy(strategies)),
+    new("Slavek-AI", new AIBoard(PreparedMap.MapSmaDef_MarKubMax()), new AIGameStrategy()),
+    new("Slavek-LAI", new AIBoard(PreparedMap.MapSmaDef_MarKubMax()), new LearningAIGameStrategy(100)),
 	new("Kuba" , new KubaBoardCreationStrategy () , new KubaStrategie()),
     //new("External", new ExternalBoardCreationStrategy(65431), new ExternalGameStrategy(65432)),
     new("Honza", new ChatGptBoardCreationStrategy(), new HonzaGameStrategy()),

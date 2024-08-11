@@ -14,6 +14,9 @@ public class LearningAIGameStrategy : AIGameStrategy
         _roundLength = roundLength;
         _roundCounter = roundLength;
     }
+
+    public LearningAIGameStrategy() : this(100)
+    {}
     
     public override void Start(GameSetting setting)
     {
