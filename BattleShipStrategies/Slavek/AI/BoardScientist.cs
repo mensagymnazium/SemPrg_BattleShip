@@ -91,8 +91,9 @@ public static class BoardScientist
         return new PreparedMap(setting, bestBoats);
     }
     
-    public static PreparedMap UnstableSmart(GameSetting setting, Dictionary<IGameStrategy, double> enemies,
-        Dictionary<IGameStrategy, double> allies, uint tries=10000, uint precision=20)
+    public static PreparedMap UnstableSmart(GameSetting setting, Dictionary<IGameStrategy,
+            (double coefficient, bool stable)> enemies,
+        Dictionary<IGameStrategy, (double coefficient, bool stable)> allies, uint tries=10000, uint precision=20)
     {
         IBoardCreationStrategy boardStrategy = new SmartRandomBoardCreationStrategy();
         BoatPaster paster = new BoatPaster();
@@ -109,13 +110,14 @@ public static class BoardScientist
             Game game = new Game(paster, setting);
             double newScore = 0;
             
-            for (uint j = 0; j < precision; j++)
-            {
-                foreach (IGameStrategy strategy in enemies.Keys)
-                    newScore += game.SimulateGame(strategy) * enemies[strategy];
-                foreach (IGameStrategy strategy in allies.Keys)
-                    newScore -= game.SimulateGame(strategy) * allies[strategy];
-            }
+            foreach (IGameStrategy strategy in enemies.Keys)
+                for (uint j = 0; j < (enemies[strategy].stable ? 1 : precision); j++)
+                    newScore += game.SimulateGame(strategy) * enemies[strategy].coefficient *
+                                (enemies[strategy].stable ? precision : 1);
+            foreach (IGameStrategy strategy in allies.Keys)
+                for (uint j = 0; j < (allies[strategy].stable ? 1 : precision); j++)
+                    newScore -= game.SimulateGame(strategy) * allies[strategy].coefficient * 
+                                (allies[strategy].stable ? precision : 1);
 
             if (newScore > bestScore)
             {
