@@ -42,6 +42,12 @@ public sealed class Game
         }
     }
 
+    public Game(Int2[] boatPositions, GameSetting setting)
+    {
+        _boardTemplate = GenerateBoardFromBoats(boatPositions, setting);
+        _setting = setting;
+    }
+
     /// <summary>
     /// Plays the game with on a board with a strategy. Calculates how many moves the strategy took to sink all boats.
     /// </summary>
