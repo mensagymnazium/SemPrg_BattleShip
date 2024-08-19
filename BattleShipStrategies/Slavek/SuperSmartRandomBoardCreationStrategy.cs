@@ -12,7 +12,6 @@ public class SuperSmartRandomBoardCreationStrategy : IBoardCreationStrategy
     private readonly IBoardCreationStrategy _smartStrategy;
     private readonly List<IGameStrategy> _enemyStrategies;
     private readonly List<IGameStrategy> _allyStrategies;
-    private readonly BoatPaster _paster = new BoatPaster();
 
     public SuperSmartRandomBoardCreationStrategy(string name="Warrior")
     {
@@ -40,9 +39,8 @@ public class SuperSmartRandomBoardCreationStrategy : IBoardCreationStrategy
         for (int i = 0; i < 10; i++)
         {
             Int2[] newResult = _smartStrategy.GetBoatPositions(setting);
-            _paster.SetBoats(newResult);
             int newMoves = 0;
-            Game game = new Game(_paster, setting);
+            Game game = new Game(newResult, setting);
             foreach (var gameStrategy in _enemyStrategies)
             {
                 newMoves += game.SimulateGame(gameStrategy);
@@ -58,19 +56,5 @@ public class SuperSmartRandomBoardCreationStrategy : IBoardCreationStrategy
             }
         }
         return bestResult;
-    }
-}
-
-internal class BoatPaster : IBoardCreationStrategy
-{
-    private Int2[] _boats = new Int2[]{};
-    public void SetBoats(Int2[] boats)
-    {
-        _boats = boats;
-    }
-    
-    public Int2[] GetBoatPositions(GameSetting setting)
-    {
-        return _boats;
     }
 }
