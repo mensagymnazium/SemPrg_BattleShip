@@ -14,7 +14,12 @@ public class ServerTournament : AbstractTournament
         : base(participants)
     {
         _gamesPerBoard = gamesPerBoard;
-        IPAddress = ipAddress ?? IPAddress.Parse("127.0.0.1");
+        if (ipAddress is null)
+        {
+            IPHostEntry ipHost = Dns.GetHostEntry(Dns.GetHostName());
+            ipAddress = ipHost.AddressList[0];
+        }
+        IPAddress = ipAddress;
     }
 
     public override void PlayAndPrint(GameSetting settings)
