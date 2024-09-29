@@ -8,7 +8,6 @@ public static class BoardScientist
     public static PreparedMap StableNemesis(GameSetting setting, IGameStrategy strategy, uint tries=10000)
     {
         IBoardCreationStrategy boardStrategy = new SmartRandomBoardCreationStrategy();
-        BoatPaster paster = new BoatPaster();
         int boatTileCount = 0;
         for (int i = 0; i < setting.BoatCount.Length; i++)
             boatTileCount += setting.BoatCount[i] * (i + 1);
@@ -18,8 +17,7 @@ public static class BoardScientist
         for (uint i = 0; i < tries; i++)
         {
             Int2[] newBoats = boardStrategy.GetBoatPositions(setting);
-            paster.SetBoats(newBoats);
-            Game game = new Game(paster, setting);
+            Game game = new Game(newBoats, setting);
             int newTurns = game.SimulateGame(strategy);
             if (newTurns > bestTurns)
             {
@@ -35,7 +33,6 @@ public static class BoardScientist
         uint tries=10000, uint precision=20)
     {
         IBoardCreationStrategy boardStrategy = new SmartRandomBoardCreationStrategy();
-        BoatPaster paster = new BoatPaster();
         int boatTileCount = 0;
         for (int i = 0; i < setting.BoatCount.Length; i++)
             boatTileCount += setting.BoatCount[i] * (i + 1);
@@ -45,8 +42,7 @@ public static class BoardScientist
         for (uint i = 0; i < tries; i++)
         {
             Int2[] newBoats = boardStrategy.GetBoatPositions(setting);
-            paster.SetBoats(newBoats);
-            Game game = new Game(paster, setting);
+            Game game = new Game(newBoats, setting);
             int newTurns = 0;
             for (uint j = 0; j < precision; j++)
                 newTurns += game.SimulateGame(strategy);
@@ -64,7 +60,6 @@ public static class BoardScientist
         Dictionary<IGameStrategy, double> allies, uint tries=10000)
     {
         IBoardCreationStrategy boardStrategy = new SmartRandomBoardCreationStrategy();
-        BoatPaster paster = new BoatPaster();
         int boatTileCount = 0;
         for (int i = 0; i < setting.BoatCount.Length; i++)
             boatTileCount += setting.BoatCount[i] * (i + 1);
@@ -74,8 +69,7 @@ public static class BoardScientist
         for (uint i = 0; i < tries; i++)
         {
             Int2[] newBoats = boardStrategy.GetBoatPositions(setting);
-            paster.SetBoats(newBoats);
-            Game game = new Game(paster, setting);
+            Game game = new Game(newBoats, setting);
             double newScore = 0;
             foreach (IGameStrategy strategy in enemies.Keys)
                 newScore += game.SimulateGame(strategy) * enemies[strategy];
@@ -96,7 +90,6 @@ public static class BoardScientist
         Dictionary<IGameStrategy, (double coefficient, bool stable)> allies, uint tries=10000, uint precision=20)
     {
         IBoardCreationStrategy boardStrategy = new SmartRandomBoardCreationStrategy();
-        BoatPaster paster = new BoatPaster();
         int boatTileCount = 0;
         for (int i = 0; i < setting.BoatCount.Length; i++)
             boatTileCount += setting.BoatCount[i] * (i + 1);
@@ -106,8 +99,7 @@ public static class BoardScientist
         for (uint i = 0; i < tries; i++)
         {
             Int2[] newBoats = boardStrategy.GetBoatPositions(setting);
-            paster.SetBoats(newBoats);
-            Game game = new Game(paster, setting);
+            Game game = new Game(newBoats, setting);
             double newScore = 0;
             
             foreach (IGameStrategy strategy in enemies.Keys)

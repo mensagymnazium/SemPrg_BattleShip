@@ -3,13 +3,10 @@ using BattleShipStrategies.Default;
 
 namespace BattleShipStrategies.Slavek;
 
-public class DeathCrossStrategy : IGameStrategy
+public class DeathCrossStrategy : AbstractSlavekStrategy
 {
     private readonly List<List<Int2>> _stablePlaces = new();
     private readonly List<IBoardCreationStrategy> _stableStrategies;
-    private SlavekTile[,] _board = new SlavekTile[0,0];
-    private GameSetting _setting;
-    private Int2 _lastMove;
     private readonly List<Int2> _deathCross = new();
     private bool _hunter;
     private (Int2 from, Int2 to) _bleeding;
@@ -23,15 +20,8 @@ public class DeathCrossStrategy : IGameStrategy
     {
         _stableStrategies = strategies;
     }
-    
-    public Int2 GetMove()
-    {
-        Int2 move = Move();
-        _lastMove = move;
-        return move;
-    }
 
-    private Int2 Move()
+    protected override Int2 Move()
     {
         if (_hunter)
         {
@@ -139,9 +129,8 @@ public class DeathCrossStrategy : IGameStrategy
         return depth;
     }
 
-    public void RespondHit()
+    public override void RespondHit()
     {
-        //Console.WriteLine("Hit!");
         if (_hunter)
         {
             if (_lastMove.X < _bleeding.from.X || _lastMove.Y < _bleeding.from.Y)
@@ -154,57 +143,27 @@ public class DeathCrossStrategy : IGameStrategy
             _hunter = true;
             _bleeding = (_lastMove, _lastMove);
         }
-        _board[_lastMove.X, _lastMove.Y] = SlavekTile.DamagedBoat;
+        base.RespondHit();
+        if (_stablePlaces.Any())
+        {
+            List<List<Int2>> toRemove = new();
+            foreach (List<Int2> places in _stablePlaces)
+                if (!places.Contains(_lastMove))
+                    toRemove.Add(places);
+            foreach (List<Int2> places in toRemove)
+                _stablePlaces.Remove(places);
+        }
     }
 
-    public void RespondSunk()
+    public override void RespondSunk()
     {
-        //Console.WriteLine("SUNK!!!");
         _hunter = false;
-        for (int i = 0; i < 4; i++)
-            BoatIsDead(_lastMove, (Direction) i);
-    }
-    
-    private void BoatIsDead(Int2 position, Direction direction)
-    {
-        if (direction == Direction.Left || direction == Direction.Right)
-        {
-            if (position.Y < _setting.Height - 1
-                && _board[position.X, position.Y + 1] == SlavekTile.Unknown)
-                _board[position.X, position.Y + 1] = SlavekTile.Water;
-            if (position.Y > 0
-                && _board[position.X, position.Y - 1] == SlavekTile.Unknown)
-                _board[position.X, position.Y - 1] = SlavekTile.Water;
-        }
-        if (direction == Direction.Up || direction == Direction.Down)
-        {
-            if (position.X < _setting.Width - 1
-                && _board[position.X + 1, position.Y] == SlavekTile.Unknown)
-                _board[position.X + 1, position.Y] = SlavekTile.Water;
-            if (position.X > 0
-                && _board[position.X - 1, position.Y] == SlavekTile.Unknown)
-                _board[position.X - 1, position.Y] = SlavekTile.Water;
-        }
-        
-        if (_board[position.X, position.Y] == SlavekTile.Unknown)
-            _board[position.X, position.Y] = SlavekTile.Water;
-        if (_board[position.X, position.Y] == SlavekTile.Water)
-            return;
-        
-        if (position.X > 0 && direction == Direction.Left)
-            BoatIsDead(position with {X = position.X - 1}, direction);
-        if (position.X < _setting.Width - 1 && direction == Direction.Right)
-            BoatIsDead(position with {X = position.X + 1}, direction);
-        if (position.Y > 0 && direction == Direction.Up)
-            BoatIsDead(position with {Y = position.Y - 1}, direction);
-        if (position.Y < _setting.Height - 1 && direction == Direction.Down)
-            BoatIsDead(position with {Y = position.Y + 1}, direction);
+        base.RespondSunk();
     }
 
-    public void RespondMiss()
+    public override void RespondMiss()
     {
-        //Console.WriteLine("Miss.");
-        _board[_lastMove.X, _lastMove.Y] = SlavekTile.Water;
+        base.RespondMiss();
         if (_stablePlaces.Any())
         {
             List<List<Int2>> toRemove = new();
@@ -216,12 +175,10 @@ public class DeathCrossStrategy : IGameStrategy
         }
     }
 
-    public void Start(GameSetting setting)
+    public override void Start(GameSetting setting)
     {
-        _board = new SlavekTile[setting.Width, setting.Height];
         if (_setting != setting)
         {
-            _setting = setting;
             _deathCross.Clear();
             int mySum = Math.Min(setting.Width, setting.Height);
             for (int i = 0; i < mySum; i++)
@@ -230,9 +187,10 @@ public class DeathCrossStrategy : IGameStrategy
                 _deathCross.Add(new Int2(i, mySum - 1 - i));
             }
         }
+        base.Start(setting);
         _stablePlaces.Clear();
-        for (int i = 0; i < _stableStrategies.Count; i++)
-            _stablePlaces.Add(_stableStrategies[i].GetBoatPositions(setting).ToList());
+        foreach (var strategy in _stableStrategies)
+            _stablePlaces.Add(strategy.GetBoatPositions(setting).ToList());
         _hunter = false;
     }
 
